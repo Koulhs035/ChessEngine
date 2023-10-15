@@ -26,15 +26,21 @@ char ChessBoard::numberToLetter(short number) {
 		return '0';
 	}
 }
-
-bool ChessBoard::sameColor(char piece1, char piece2) {
-	return (!(isupper(piece1) ^ isupper(piece2)));
+bool ChessBoard::myUpper(char piece) {
+	switch (piece) {
+	case 'P':
+	case 'R':
+	case 'B':
+	case 'K':
+	case 'N':
+	case 'Q':
+		return true;
+	default:
+		return false;
+	}
 }
 
 
-
-std::vector<ChessBoard> ChessBoard::getPositions() {
-	return positions;
+bool ChessBoard::sameColor(bool piece1, char piece2) {
+	return !(piece1 ^ myUpper(piece2));
 }
-
-

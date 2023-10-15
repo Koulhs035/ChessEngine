@@ -1,5 +1,7 @@
 #include "ChessBoard.h"
+#include "DepthGen.h"
 
+extern DepthGen myGen;
 /*
 * Here it generates all the legal moves the position can have
 * Once everything is generated it will be passed to a make move function
@@ -8,37 +10,34 @@
 * After a certain depth is reached, the data will be collected to show what is the best move for this position
 */
 
-void ChessBoard::generateMoves() {
 
-	positions.clear();
+void ChessBoard::generateMoves(bool turn) {
 
 	for (short row = 0; row < 8; row++) {
 		for (short col = 0; col < 8; col++) {
 			char curpiece = chessboard[row][col];
-			if (isupper(curpiece) xor turn) {
+			if (curpiece != ' ' && !(myUpper(curpiece) ^ turn)) {
+				switch (toupper(curpiece)) {
+				case 'P':
+					generateMovesPawn(row, col, turn);
+					break;
+				case 'N':
+					generateMovesKnight(row, col, turn);
+					break;
+				case 'R':
+					generateMovesRook(row, col, turn);
+					break;
+				case 'B':
+					generateMovesBishop(row, col, turn);
+					break;
+					// Add more cases for other piece types if needed
+				case 'Q':
+					generateMovesRook(row, col, turn);
+					generateMovesBishop(row, col, turn);
+					break;
+				default:
+					break;
 
-				if (curpiece != ' ') {
-					switch (toupper(curpiece)) {
-					case 'P':
-						generateMovesPawn(row, col, curpiece);
-						break;
-					case 'N':
-						generateMovesKnight(row, col, curpiece);
-						break;
-					case 'R':
-						generateMovesRook(row, col, curpiece);
-						break;
-					case 'B':
-						generateMovesBishop(row, col, curpiece);
-						break;
-						// Add more cases for other piece types if needed
-					case 'Q':
-						generateMovesRook(row, col, curpiece);
-						generateMovesBishop(row, col, curpiece);
-						break;
-					default:
-						break;
-					}
 				}
 			}
 		}
@@ -46,9 +45,10 @@ void ChessBoard::generateMoves() {
 }
 
 
+
 //--------PAWN--------//
-void ChessBoard::generateMovesPawn(short row, short col, char curPiece) {
-	short color = (islower(curPiece)) ? -1 : 1;  // -1 for black, 1 for white
+void ChessBoard::generateMovesPawn(short row, short col, bool curPiece) {
+	short color = (!curPiece) ? -1 : 1;  // -1 for black, 1 for white
 	short newRow = row + color;
 
 	if (newRow >= 0 && newRow <= 7) {
@@ -88,21 +88,20 @@ void ChessBoard::generateMovesPawn(short row, short col, char curPiece) {
 
 
 
-
 //--------KNIGHT--------//
-void ChessBoard::generateMovesKnight(short row, short col, char pieceLetter) {
+void ChessBoard::generateMovesKnight(short row, short col, bool turn) {
 	// Possible knight move offsets
-	short dx[] = { 2, 2, -2, -2, 1, 1, -1, -1 };
-	short dy[] = { 1, -1, 1, -1, 2, -2, 2, -2 };
+	const short dx[] = { 2, 2, -2, -2, 1, 1, -1, -1 };
+	const short dy[] = { 1, -1, 1, -1, 2, -2, 2, -2 };
 
-	for (int i = 0; i < 8; ++i) {
+	for (short i = 0; i < 8; ++i) {
 		short newRow = row + dx[i];
 		short newCol = col + dy[i];
 
 		// Check if the new position is within the chessboard
 		if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
 			// Check if the move is valid according to your game logic (e.g., not attacking your own pieces)
-			if (!sameColor(pieceLetter, chessboard[newRow][newCol]) || chessboard[newRow][newCol] == 0) {
+			if (!sameColor(turn, chessboard[newRow][newCol]) || chessboard[newRow][newCol] == 0) {
 				movePiece(row, col, newRow, newCol);
 			}
 		}
@@ -111,42 +110,42 @@ void ChessBoard::generateMovesKnight(short row, short col, char pieceLetter) {
 
 
 //--------THE ROOK--------//
-void ChessBoard::generateMovesRook(short row, short col, char pieceLetter) {
+void ChessBoard::generateMovesRook(short row, short col, bool turn) {
 	// Horizontal right movement
 	for (short newCol = col + 1; newCol < 8; newCol++) {
-		if (!RookMovement(row, col, row, newCol, pieceLetter)) {
+		if (!RookMovement(row, col, row, newCol, turn)) {
 			break;
 		}
 	}
 
 	// Horizontal left movement
 	for (short newCol = col - 1; newCol >= 0; newCol--) {
-		if (!RookMovement(row, col, row, newCol, pieceLetter)) {
+		if (!RookMovement(row, col, row, newCol, turn)) {
 			break;
 		}
 	}
 
 	// Vertical up movement
 	for (short newRow = row + 1; newRow < 8; newRow++) {
-		if (!RookMovement(row, col, newRow, col, pieceLetter)) {
+		if (!RookMovement(row, col, newRow, col,  turn)) {
 			break;
 		}
 	}
 
 	// Vertical down movement
 	for (short newRow = row - 1; newRow >= 0; newRow--) {
-		if (!RookMovement(row, col, newRow, col, pieceLetter)) {
+		if (!RookMovement(row, col, newRow, col,  turn)) {
 			break;
 		}
 	}
 }
 
-bool ChessBoard::RookMovement(short initRow, short initCol, short row, short col, char pieceLetter) {
+bool ChessBoard::RookMovement(short initRow, short initCol, short row, short col, bool turn) {
 	if (chessboard[row][col] == ' ') {
 		movePiece(initRow, initCol, row, col);
 		return true;
 	}
-	else if (!sameColor(pieceLetter, chessboard[row][col])) {
+	else if (!sameColor(turn, chessboard[row][col])) {
 		movePiece(initRow, initCol, row, col);
 	}
 	return false;
@@ -155,7 +154,7 @@ bool ChessBoard::RookMovement(short initRow, short initCol, short row, short col
 
 
 //--------BISHOP--------//
-void ChessBoard::generateMovesBishop(short row, short col, char curPiece) {
+void ChessBoard::generateMovesBishop(short row, short col, bool turn) {
 	static const short directions[4][2] = { {-1, -1}, {-1, 1}, {1, -1}, {1, 1} };
 
 	for (int dir = 0; dir < 4; dir++) {
@@ -173,7 +172,7 @@ void ChessBoard::generateMovesBishop(short row, short col, char curPiece) {
 				movePiece(row, col, newRow, newCol);
 			}
 			else {
-				if (!sameColor(curPiece, targetPiece)) {
+				if (!sameColor(turn, targetPiece)) {
 					movePiece(row, col, newRow, newCol);
 				}
 				break;  // Stop moving in this direction after capturing or blocking
@@ -187,20 +186,15 @@ void ChessBoard::movePiece(short row, short col, short newRow, short newCol) {
 	char curPiece = this->chessboard[row][col];
 	char newChessboard[8][8];
 
-	// Copy the contents of the current chessboard to the newChessboard
-	for (short i = 0; i < 8; i++) {
-		for (short j = 0; j < 8; j++) {
-			newChessboard[i][j] = this->chessboard[i][j];
-		}
-	}
+	memcpy(newChessboard, this->chessboard, 64);
+
 
 	// Make the move by updating the newChessboard
 	newChessboard[row][col] = ' ';
 	newChessboard[newRow][newCol] = curPiece;
 
-	ChessBoard newBoard(newChessboard, this, this->turn);
 
-	// Check if the new position is unique before adding it
-	positions.push_back(newBoard);
+	myGen.positions.push_back(ChessBoard(newChessboard, this));
 
+	return;
 }
