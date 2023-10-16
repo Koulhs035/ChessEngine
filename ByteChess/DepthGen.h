@@ -11,8 +11,6 @@ struct DepthGen {
 	std::vector<std::vector<ChessBoard>> inDepthPositions;
 
 	void loadToDepth(int depth, ChessBoard initialPosition);
-
-	//std::vector<ChessBoard> pruneDuplicates();
 };
 
 

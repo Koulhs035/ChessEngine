@@ -13,8 +13,8 @@ extern DepthGen myGen;
 
 void ChessBoard::generateMoves(bool turn) {
 
-	for (short row = 0; row < 8; row++) {
-		for (short col = 0; col < 8; col++) {
+	for (uint8_t row = 0; row < 8; row++) {
+		for (uint8_t col = 0; col < 8; col++) {
 			char curpiece = chessboard[row][col];
 			if (curpiece != ' ' && !(myUpper(curpiece) ^ turn)) {
 				switch (toupper(curpiece)) {
@@ -34,6 +34,9 @@ void ChessBoard::generateMoves(bool turn) {
 				case 'Q':
 					generateMovesRook(row, col, turn);
 					generateMovesBishop(row, col, turn);
+					break;
+				case 'K':
+					generateMovesKing(row, col, turn);
 					break;
 				default:
 					break;
@@ -127,14 +130,14 @@ void ChessBoard::generateMovesRook(short row, short col, bool turn) {
 
 	// Vertical up movement
 	for (short newRow = row + 1; newRow < 8; newRow++) {
-		if (!RookMovement(row, col, newRow, col,  turn)) {
+		if (!RookMovement(row, col, newRow, col, turn)) {
 			break;
 		}
 	}
 
 	// Vertical down movement
 	for (short newRow = row - 1; newRow >= 0; newRow--) {
-		if (!RookMovement(row, col, newRow, col,  turn)) {
+		if (!RookMovement(row, col, newRow, col, turn)) {
 			break;
 		}
 	}
@@ -181,6 +184,25 @@ void ChessBoard::generateMovesBishop(short row, short col, bool turn) {
 	}
 }
 
+//--------KING--------//
+void ChessBoard::generateMovesKing(short row, short col, bool turn) {
+	static const short directions[8][2] = {
+		{-1, -1}, {-1, 0}, {-1, 1},	{0, -1},{0, 1},{1, -1}, {1, 0}, {1, 1}
+	};
+
+	for (int dir = 0; dir < 8; dir++) {
+		short newRow = row + directions[dir][0];
+		short newCol = col + directions[dir][1];
+
+		if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
+			char targetPiece = chessboard[newRow][newCol];
+			if (targetPiece == ' ' || !sameColor(turn, targetPiece)) {
+				movePiece(row, col, newRow, newCol);
+			}
+		}
+	}
+}
+
 
 void ChessBoard::movePiece(short row, short col, short newRow, short newCol) {
 	char curPiece = this->chessboard[row][col];
@@ -193,6 +215,7 @@ void ChessBoard::movePiece(short row, short col, short newRow, short newCol) {
 	newChessboard[row][col] = ' ';
 	newChessboard[newRow][newCol] = curPiece;
 
+	// Check duplicates logic
 
 	myGen.positions.push_back(ChessBoard(newChessboard, this));
 

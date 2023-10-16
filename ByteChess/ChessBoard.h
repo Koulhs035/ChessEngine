@@ -34,6 +34,8 @@ private:
 
 	void generateMovesBishop(short row, short col, bool turn);
 
+	void generateMovesKing(short row, short col, bool turn);
+
 	//For queen move generation, I've combined bishop and rook
 
 	//New position constructor
@@ -49,5 +51,6 @@ public:
 
 	void printBoard();
 
+	char(*getChessboard())[8];
 };
 #endif // CHESSBOARD_H
