@@ -6,7 +6,7 @@
 
 
 struct DepthGen {
-
+	// Positions are saved here
 	std::vector<ChessBoard> positions;
 	std::vector<std::vector<ChessBoard>> inDepthPositions;
 

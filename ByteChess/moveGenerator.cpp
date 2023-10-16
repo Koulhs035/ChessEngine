@@ -11,7 +11,7 @@ extern DepthGen myGen;
 */
 
 
-void ChessBoard::generateMoves(bool turn) {
+void ChessBoard::generateMoves(const bool turn) {
 
 	for (uint8_t row = 0; row < 8; row++) {
 		for (uint8_t col = 0; col < 8; col++) {
@@ -50,8 +50,8 @@ void ChessBoard::generateMoves(bool turn) {
 
 
 //--------PAWN--------//
-void ChessBoard::generateMovesPawn(short row, short col, bool curPiece) {
-	short color = (!curPiece) ? -1 : 1;  // -1 for black, 1 for white
+void ChessBoard::generateMovesPawn(short row, short col, const bool turn) {
+	short color = (!turn) ? -1 : 1;  // -1 for black, 1 for white
 	short newRow = row + color;
 
 	if (newRow >= 0 && newRow <= 7) {
@@ -74,16 +74,60 @@ void ChessBoard::generateMovesPawn(short row, short col, bool curPiece) {
 
 		if (leftCol >= 0) {
 			char leftPiece = chessboard[newRow][leftCol];
-			if (leftPiece != ' ' && !sameColor(curPiece, leftPiece)) {
+			if (leftPiece != ' ' && !sameColor(turn, leftPiece)) {
 				movePiece(row, col, leftCol, newRow);
 			}
+
+
 		}
+			enPassant(row, col, rightCol);
 
 		if (rightCol <= 7) {
 			char rightPiece = chessboard[newRow][rightCol];
-			if (rightPiece != ' ' && !sameColor(curPiece, rightPiece)) {
+			if (rightPiece != ' ' && !sameColor(turn, rightPiece)) {
 				movePiece(row, col, rightCol, newRow);
 			}
+		}
+			enPassant(col, rightCol, turn);
+
+	}
+}
+
+
+void ChessBoard::enPassant(short curCol, short prevCol, const bool turn) {
+
+	if (previousPosition != nullptr) {
+		//White side En Passant
+		if (!turn && (chessboard[4][prevCol] == 'p' && previousPosition->chessboard[6][prevCol] == 'p' && previousPosition->chessboard[5][prevCol] == ' ')) {
+			char newChessboard[8][8];
+
+			memcpy(newChessboard, this->chessboard, 64);
+			newChessboard[5][curCol] = ' ';
+
+			newChessboard[4][prevCol] = ' '; // Pawn captured
+
+			newChessboard[5][prevCol] = 'P';
+
+			myGen.positions.push_back(ChessBoard(newChessboard, this));
+
+
+
+
+		} // Black side En Passant
+		else if (turn && (chessboard[3][prevCol] == 'P' && previousPosition->chessboard[1][prevCol] == 'P' && previousPosition->chessboard[2][prevCol] == ' ')) {
+			char newChessboard[8][8];
+
+			memcpy(newChessboard, this->chessboard, 64);
+
+			newChessboard[2][curCol] = ' ';
+
+			newChessboard[3][prevCol] = ' '; // Pawn captured
+			
+			newChessboard[2][prevCol] = 'p';
+
+			myGen.positions.push_back(ChessBoard(newChessboard, this));
+
+
 		}
 	}
 }
@@ -92,7 +136,7 @@ void ChessBoard::generateMovesPawn(short row, short col, bool curPiece) {
 
 
 //--------KNIGHT--------//
-void ChessBoard::generateMovesKnight(short row, short col, bool turn) {
+void ChessBoard::generateMovesKnight(short row, short col, const bool turn) {
 	// Possible knight move offsets
 	const short dx[] = { 2, 2, -2, -2, 1, 1, -1, -1 };
 	const short dy[] = { 1, -1, 1, -1, 2, -2, 2, -2 };
@@ -113,7 +157,7 @@ void ChessBoard::generateMovesKnight(short row, short col, bool turn) {
 
 
 //--------THE ROOK--------//
-void ChessBoard::generateMovesRook(short row, short col, bool turn) {
+void ChessBoard::generateMovesRook(short row, short col, const bool turn) {
 	// Horizontal right movement
 	for (short newCol = col + 1; newCol < 8; newCol++) {
 		if (!RookMovement(row, col, row, newCol, turn)) {
@@ -157,7 +201,7 @@ bool ChessBoard::RookMovement(short initRow, short initCol, short row, short col
 
 
 //--------BISHOP--------//
-void ChessBoard::generateMovesBishop(short row, short col, bool turn) {
+void ChessBoard::generateMovesBishop(short row, short col,const bool turn) {
 	static const short directions[4][2] = { {-1, -1}, {-1, 1}, {1, -1}, {1, 1} };
 
 	for (int dir = 0; dir < 4; dir++) {
@@ -185,7 +229,7 @@ void ChessBoard::generateMovesBishop(short row, short col, bool turn) {
 }
 
 //--------KING--------//
-void ChessBoard::generateMovesKing(short row, short col, bool turn) {
+void ChessBoard::generateMovesKing(short row, short col, const bool turn) {
 	static const short directions[8][2] = {
 		{-1, -1}, {-1, 0}, {-1, 1},	{0, -1},{0, 1},{1, -1}, {1, 0}, {1, 1}
 	};

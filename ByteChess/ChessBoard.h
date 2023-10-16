@@ -15,8 +15,11 @@ private:
 
 	//Different tools for the chessboard
 	void placePiece(char piece, short col);
+	
 	char numberToLetter(short num);
+
 	bool sameColor(bool piece1, char piece2);
+
 	bool myUpper(char piece);
 
 
@@ -25,6 +28,8 @@ private:
 	void movePiece(short row, short col, short newRow, short newCol);
 
 	void generateMovesPawn(short row, short col, bool turn);
+
+	void enPassant(short curCol, short newCol, bool turn);
 
 	void generateMovesKnight(short row, short col, bool turn);
 
@@ -41,11 +46,8 @@ private:
 	//New position constructor
 	ChessBoard(char initialChessboard[8][8], ChessBoard* previousPosition);
 
-
-
 public:
-	ChessBoard(); //Default constructor
-
+	ChessBoard(); //First positions of the board
 
 	void generateMoves(bool turn);
 
