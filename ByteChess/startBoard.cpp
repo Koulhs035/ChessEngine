@@ -13,8 +13,10 @@
 
 // Starting position constructor
 ChessBoard::ChessBoard() : previousPosition(nullptr) {
+	evaluation = 0;
+
 	// Here is the starting position of the board
-	for (short row = 2; row < 6; row++) {
+	for (short row = 0; row < 8; row++) {
 		for (short col = 0; col < 8; col++) {
 			this->chessboard[row][col] = ' ';
 		}
@@ -40,10 +42,10 @@ ChessBoard::ChessBoard() : previousPosition(nullptr) {
 	chessboard[7][4] = 'k';
 }
 
-ChessBoard::ChessBoard(char initialChessboard[8][8], ChessBoard* previousPosition) {
+ChessBoard::ChessBoard(char initialChessboard[8][8], ChessBoard* previousPos, short eval) {
 	// Initialize the previousPosition
-	this->previousPosition = previousPosition;
-
+	previousPosition = previousPos;
+	evaluation = previousPos->getEval() + eval;
 	memcpy(this->chessboard, initialChessboard, 64);
 }
 
@@ -56,6 +58,3 @@ void ChessBoard::placePiece(char piece, short col) {
 	chessboard[7][7 - col] = blackPiece;
 	chessboard[7][col] = blackPiece;
 }
-
-
-

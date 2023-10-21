@@ -10,8 +10,10 @@ struct DepthGen {
 	std::vector<ChessBoard> positions;
 	std::vector<std::vector<ChessBoard>> inDepthPositions;
 
-	void loadToDepth(int depth, ChessBoard initialPosition);
-};
+	void loadToDepth(int depth);
 
+	void SortAndTruncate(int n, bool ascending);
+
+};
 
 #endif

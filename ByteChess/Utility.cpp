@@ -45,7 +45,8 @@ bool ChessBoard::sameColor(bool piece1, char piece2) {
 	return !(piece1 ^ myUpper(piece2));
 }
 
-// Getter function to return the chessboard array
-char(*ChessBoard::getChessboard())[8] {
-	return chessboard;
-	}
+
+
+short ChessBoard::getEval() {
+	return evaluation;
+}

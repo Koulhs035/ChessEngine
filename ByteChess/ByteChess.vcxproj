@@ -129,6 +129,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DepthGen.cpp" />
+    <ClCompile Include="Evaluation.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="moveGenerator.cpp" />
     <ClCompile Include="startBoard.cpp" />
